@@ -4,6 +4,7 @@ import com.devsuperior.dslist.dto.GameDTO;
 import com.devsuperior.dslist.dto.GameMinDTO;
 import com.devsuperior.dslist.entities.Game;
 import com.devsuperior.dslist.repositories.GameRepository;
+import com.devsuperior.dslist.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,8 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public GameDTO findById(Long id) {
-        Game game = gameRepository.findById(id).get();
+        Game game = gameRepository.findById(id).
+                orElseThrow(() -> new ResourceNotFoundException("Jogo não encontrado"));
         return new GameDTO(game);
     }
 }
