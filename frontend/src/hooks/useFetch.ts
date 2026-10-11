@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface FetchState<T> {
   data: T | null
   loading: boolean
   error: string | null
+  setData: (data: T) => void
 }
 
 interface Result<T> {
@@ -37,7 +38,12 @@ export function useFetch<T>(fetcher: () => Promise<T>): FetchState<T> {
     }
   }, [fetcher])
 
+  // Permite alterar os dados localmente (ex.: reordenar antes de a API confirmar)
+  const setData = useCallback((data: T) => {
+    setResult((current) => (current ? { ...current, data } : current))
+  }, [])
+
   // Resultado de outra busca (ou nenhum ainda) significa que a atual está em andamento
-  if (result?.source !== fetcher) return { data: null, loading: true, error: null }
-  return { data: result.data, loading: false, error: result.error }
+  if (result?.source !== fetcher) return { data: null, loading: true, error: null, setData }
+  return { data: result.data, loading: false, error: result.error, setData }
 }
